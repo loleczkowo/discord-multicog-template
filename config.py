@@ -34,7 +34,7 @@ ids_objects = IDsObjects(target=IDs)
 events = Events()
 EV_STARTUP = dtEvent("startup")
 EV_RECCONECT = dtEvent("startup")
-
+EV_SHUTDOWN = dtEvent("shutdown")
 
 
 # -- LOGS CONFIG --

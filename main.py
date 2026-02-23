@@ -6,7 +6,7 @@ import discord
 from discord.ext import commands
 from dotenv import load_dotenv
 
-from core import log, discord_log
+from core import log, discord_log, run_shutdown
 from config import (
     IDs, ids_objects, COMMAND_PREFIX, BOT_VERSION, BOT_ACTIVITY,
     events, EV_STARTUP, EV_RECCONECT,
@@ -58,8 +58,14 @@ async def set_bot_presence():
 
 
 async def main():
-    async with bot:
-        await bot.start(bot_token)
+    try:
+        async with bot:
+            await bot.start(bot_token)
+    except (KeyboardInterrupt, asyncio.exceptions.CancelledError):
+        Globals.connected = False
+        log(INFO, "Keyboard interrupt received, shutting down.")
+        if not Globals.restarting and not Globals.controlled_shutdown:
+            await run_shutdown(bot)
     await asyncio.sleep(0)
 
 

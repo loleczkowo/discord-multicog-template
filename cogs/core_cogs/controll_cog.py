@@ -1,8 +1,8 @@
 import discord
 from discord import app_commands, Embed, Color
 from discord.ext import commands
-from core import log, app_is_owner
-from config import INFO, events
+from core import log, app_is_owner, run_shutdown
+from config import INFO
 from cogs.cogscore import reload_cogs
 from globals import Globals as G
 
@@ -37,9 +37,7 @@ class ControllCog(commands.Cog):
         await interaction.response.send_message(embed=embed)
         # TODO make it so it updates the message!
         G.restarting = True
-        await events.close_all_shutdown_functions()
-        G.connected = False
-        await self.bot.close()
+        await run_shutdown(self.bot)
 
     @app_commands.command(name="shutdown", description="(*owner) Shut the bot down.")
     @app_commands.check(app_is_owner)
@@ -48,6 +46,4 @@ class ControllCog(commands.Cog):
         embed = Embed(color=Color.yellow(), title="Shutting down",
                       description="`Shutting down . . .`")
         await interaction.response.send_message(embed=embed)
-        await events.close_all_shutdown_functions()
-        G.connected = False
-        await self.bot.close()
+        await run_shutdown(self.bot)
