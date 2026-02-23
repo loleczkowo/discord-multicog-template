@@ -11,10 +11,11 @@ _EV_AUTOSAVE = dtEvent("memory_autosave")
 
 
 class Memory:
-    def __init__(self, default, var_name: str, cog_local: object = None,
+    def __init__(self, var_name: str, default, cog_local: object = None,
                  save_on_change=False):
         if cog_local is not None:
-            self._memory_where = MEMORY_DIR/"cogs"/f"Cmemory_{cog_local.__name__}.json"
+            self._memory_where = \
+                MEMORY_DIR/"cogs"/f"Cmemory_{cog_local.__class__.__name__}.json"
         else:
             self._memory_where = MEMORY_MAIN_FILE
 
@@ -24,6 +25,8 @@ class Memory:
         self._need_save = False
         if self._memory is None:
             self._memory = default
+        events.register(self._save_data, EV_SHUTDOWN)
+        events.register(self._autosave, _EV_AUTOSAVE)
 
     @property
     def mem(self):
@@ -48,26 +51,29 @@ class Memory:
         else:
             return None
 
-    @events.on_event(EV_SHUTDOWN)
     def _save_data(self):
         try:
             with open(self._memory_where, "r") as f:
                 data = json.load(f)
         except FileNotFoundError:
             data = {}
-        data[self._memory_name] = self.memory
+        data[self._memory_name] = self._memory
         with open(self._memory_where, "w") as f:
             json.dump(data, f, indent=4)
 
-    @events.on_event(_EV_AUTOSAVE)
     def _autosave(self):
         if not self._save_on_change and self._need_save:
             self._save_data()
             self._need_save = False
 
+    def close(self):
+        self._autosave()
+        events.unregister(self._save_data)
+        events.unregister(self._autosave)
+
 
 @events.on_event(EV_STARTUP, close_on_shutdown=True)
-async def _autosave_loop(self):
+async def _autosave_loop():
     try:
         while True:
             await asyncio.sleep(MEMORY_AUTOSAVE_TIME)

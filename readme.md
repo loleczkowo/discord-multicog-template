@@ -46,7 +46,9 @@ The bot has a build-in event handling system that allows you to easily add event
 
 The list of Events is stored in `config.py` file, you can easily add more events.
 
-You can use the decorators `@events.on_event(event_name, another_event_name, ...)` to add an event listener for specific events. The event listener will be called when any of the specified events are triggered by `events.call(event_name)`
+You can use the decorators `@events.on_event(event_name, another_event_name, ...)` *(`cog_on_event` for cogs)* to add an event listener for specific events. The event listener will be called when any of the specified events are triggered by `events.call(event_name)`  
+You can also use `events.register(func, event_name, another_event_name, ...)` to register a function without using a decorator.  
+To unregister an event listener, you can use `events.unregister(func)`. *(works for both decorator and register)*
 
 If a function is a loop/long lasting async task, I recommend adding `close_on_shutdown=True` to the `@events.on_event`. This will cancel the task on bot shutdown.
 
