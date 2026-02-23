@@ -56,3 +56,9 @@ ERROR:      type[LogType] = LogType("ERROR",    to_discord=True, ignore_closed_c
 CRITICAL:   type[LogType] = LogType("CRITICAL", to_discord=True, ignore_closed_console=True, ping=True)
 ALL_LOG_TYPES = [INFO, SUCCESS, USER_INPUT, RESPONSE, WARNING, ERROR, CRITICAL]
 DEFALUT_PING = IDs.ROLES.ADMIN
+
+
+# -- MEMORY --
+MEMORY_DIR = DIR/"memory"
+MEMORY_MAIN_FILE = MEMORY_DIR/"memory.json"
+MEMORY_AUTOSAVE_TIME = 5*60

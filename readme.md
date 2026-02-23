@@ -57,3 +57,9 @@ All of the IDs are stored in `config.py` with the class `IDs`.
 
 The class is also compiled into a `IDsObjects` class that returns the discord objects instead of the IDs.
 Example use; `ids_objects.CHANNELS.CONSOLE_LOGS.send("hello")`
+
+# Memory
+To store varibles that keep their value after bot restart, you can use the `Memory` class from `core/memory.py`.  
+Defining a varible goes like `varible123 = Memory("varible123", default=0,)`, To get it use `varible123.mem`.  
+The varible will save itself to a file `memory/memory.json` or `memory/cogs/Cmemory_CogName.json`. As it is a json it can only support normal data  
+Data will save every `MEMORY_AUTOSAVE_TIME` seconds. If you need the data to be saved immediately after change, you can add `save_on_change=True`.
