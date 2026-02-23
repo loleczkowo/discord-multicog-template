@@ -1,10 +1,12 @@
 import os
+import sys
+import asyncio
 import platform
 import discord
 from discord.ext import commands
 from dotenv import load_dotenv
 
-from core import log, discord_log, discord_log_loop
+from core import log, discord_log
 from config import (
     IDs, ids_objects, COMMAND_PREFIX, BOT_VERSION, BOT_ACTIVITY,
     events, EV_STARTUP, EV_RECCONECT,
@@ -40,19 +42,9 @@ async def on_ready():
     log(SUCCESS, f"Logged in as: {bot.user.name} ({bot.user.id})")
     log(INFO, "building objects")
     await ids_objects.build(bot)
-    bot.loop.create_task(discord_log_loop())
-    discord_log(INFO, "### --- BOT BOOTING ---")
-    discord_log(INFO, "### LOADING STAGE `1/2` *(`COGS`)*")
+    discord_log(INFO, "## --- BOT BOOTING ---\n### LOADING COGS")
     log(INFO, "Loading cogs")
     await load_cogs(bot, cog_list)
-    discord_log(INFO, "### LOADING STAGE `2/2` *(`SYNC COMMANDS`)*")
-    log(INFO, "Syncing commands to guild")
-    try:
-        await bot.tree.sync()
-        await bot.tree.sync(guild=discord.Object(id=IDs.GUILD))
-        log(SUCCESS, "Commands synced successfully.")
-    except discord.errors.Forbidden as e:
-        log(CRITICAL(to_discord=True), f"ERROR while sync: {e}")
     Globals.connected = True
     computer_name = platform.node()
     discord_log(INFO, f"## Bot (`V{BOT_VERSION}`) is connected with `{computer_name}`")
@@ -65,4 +57,16 @@ async def set_bot_presence():
     await bot.change_presence(activity=BOT_ACTIVITY)
 
 
-bot.run(bot_token)
+async def main():
+    async with bot:
+        await bot.start(bot_token)
+    await asyncio.sleep(0)
+
+
+if __name__ == "__main__":
+    asyncio.run(main())
+
+if Globals.restarting:
+    os.execv(sys.executable, ['python'] + sys.argv)
+else:
+    log(INFO, "--- Bot is offline. ---")

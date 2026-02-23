@@ -5,8 +5,9 @@ from typing import List
 from discord import Role
 from globals import Globals as G
 from config import (
-    LOG_DIR, LOG_RETENTION_DAYS, LOG_TO_CONSOLE, ids_objects, LOG_TIME_FORMAT,
-    ALL_LOG_TYPES, DEFALUT_PING, DISCORD_CHAR_LIMIT, ERROR)
+    LOG_DIR, LOG_RETENTION_DAYS, LOG_TO_CONSOLE, LOG_TIME_FORMAT,
+    DEFALUT_PING, ALL_LOG_TYPES, DISCORD_CHAR_LIMIT,
+    ERROR, QINFO, ids_objects, events, EV_STARTUP)
 from core.data_types import LogType
 
 
@@ -88,11 +89,16 @@ def discord_log(log_type: LogType, log_text: str):
     _plain_discord_log(f_message)
 
 
+@events.on_event(EV_STARTUP, close_on_shutdown=True)
 async def discord_log_loop():
     await G.bot.wait_until_ready()
-    while not G.bot.is_closed():
-        await send_discord_logs()
-        await asyncio.sleep(0.5)
+    log(QINFO(to_discord=False), "Discord log loop has started.")
+    try:
+        while True:
+            await send_discord_logs()
+            await asyncio.sleep(0.5)
+    except asyncio.CancelledError:
+        log(QINFO(to_discord=False), "Discord log loop has stopped.")
 
 
 async def send_discord_logs():

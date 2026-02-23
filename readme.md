@@ -23,10 +23,11 @@ The example of a cog can be found in `cogs/core_cogs/pingcog.py` file. You can a
 
 ## Current cogs
 - `core_cogs/pingcog.py` - a simple cog that has a ping command to check the bot latency.
+- `core_cogs/controll_cog.py` - a cog that has commands to control the bot (`/reload cogs`, `/restart`, `/shutdown`).
 
 # Error handling
-The bot has a built-in error handling system that catches common errors and sends a user-friendly message to the user. The error handling is done in the `core/handle_command_error.py` file, and it is automatically loaded when the bot starts.  
-You can modify the error handling to fit your needs, or add more specific error handling for your commands.
+The bot has a built-in error handling system that catches common errors and sends a message to the user. The error handling is done in the `core/handle_command_error.py` file.  
+You can modify the error handling to fit your needs, or add more specific error handling for your commands with the help of `core/check_permission.py`.
 
 # Logging
 The bot uses a custom logging system `core/log.py`. It logs important events and errors to a specific channel in the server, and also prints them to the console and writes them to a log file.
@@ -46,6 +47,8 @@ The bot has a build-in event handling system that allows you to easily add event
 The list of Events is stored in `config.py` file, you can easily add more events.
 
 You can use the decorators `@events.on_event(event_name, another_event_name, ...)` to add an event listener for specific events. The event listener will be called when any of the specified events are triggered by `events.call(event_name)`
+
+If a function is a loop/long lasting async task, I recommend adding `close_on_shutdown=True` to the `@events.on_event`. This will cancel the task on bot shutdown.
 
 # Roles Channels ect IDs
 All of the IDs are stored in `config.py` with the class `IDs`.
