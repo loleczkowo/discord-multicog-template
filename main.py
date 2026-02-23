@@ -58,6 +58,7 @@ async def set_bot_presence():
 
 
 async def main():
+    discord.utils.setup_logging()
     try:
         async with bot:
             await bot.start(bot_token)
