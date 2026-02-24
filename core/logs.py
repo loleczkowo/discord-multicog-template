@@ -49,7 +49,8 @@ def get_logs(lines: int):
     return lines[-int(lines):]
 
 
-def log(log_type: LogType, message: str):
+def log(log_type: LogType, message: str, *args, join=""):
+    message = message+join+join.join([str(a) for a in args])
     if log_type.to_discord:
         discord_log(log_type, message)
     lines = message.split("\n")
@@ -74,7 +75,8 @@ def _plain_discord_log(log_text: str):
     send_to_discord_list.append(log_text)
 
 
-def discord_log(log_type: LogType, log_text: str):
+def discord_log(log_type: LogType, log_text: str, *args, join=""):
+    log_text = log_text+join+join.join([str(a) for a in args])
     global send_to_discord_list
     ping = log_type.ping
     if ping is True:

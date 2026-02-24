@@ -77,6 +77,8 @@ class Events:
                     self.cog_registered[cog.__class__.__name__] = [attr]
 
     def reload_cog_events(self, cog: object):
+        if cog.__class__.__name__ not in self.cog_registered:
+            return
         for func in self.cog_registered[cog.__class__.__name__]:
             self.unregister(func)
         self.load_cog_events(cog)

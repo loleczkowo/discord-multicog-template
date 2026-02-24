@@ -20,10 +20,11 @@ The bot is designed to be modular, so you can easily add and remove cogs. Each c
 4. Add your commands to the class using the `@commands.command()` and `@app_commands.command()` decorators.
 5. Load the cog in the `cogs/__init__.py` by adding it to the `cog_list` list.
 The example of a cog can be found in `cogs/core_cogs/pingcog.py` file. You can also check the existing cogs for reference.
+6. Use the bot's `/_sync_commands` command and reload your discord client with `CTRL+R`
 
 ## Current cogs
 - `core_cogs/pingcog.py` - a simple cog that has a ping command to check the bot latency.
-- `core_cogs/controll_cog.py` - a cog that has commands to control the bot (`/reload cogs`, `/restart`, `/shutdown`).
+- `core_cogs/controll_cog.py` - a cog that has commands to control the bot (`/_reload cogs`, `/_sync commands`, `/_restart`, `/_shutdown`, `/_botstatus`).
 
 # Error handling
 The bot has a built-in error handling system that catches common errors and sends a message to the user. The error handling is done in the `core/handle_command_error.py` file.  
