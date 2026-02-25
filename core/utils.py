@@ -28,3 +28,19 @@ def format_traceback(error) -> List[str]:
     for i in range(1, len(formatted_lines)):
         formatted_lines[i] = f">{formatted_lines[i]}"
     return formatted_lines
+
+
+def format_time(seconds: float):
+    minutes = seconds//60
+    seconds = int(seconds-minutes*60)
+    hours = int(minutes//60)
+    minutes = int(minutes-hours*60)
+    text = ""
+    if hours > 0:
+        text += str(hours)+" hour"+"s"*(hours > 1)+" "
+    if minutes > 0:
+        text += str(minutes)+" minute"+"s"*(minutes > 1)+" "
+    if text != "":
+        text += "and "
+    text += str(seconds)+" second"+"s"*(not seconds == 1)
+    return text

@@ -1,9 +1,10 @@
+import subprocess
 import discord
 from discord import app_commands, Embed, Color
 from discord.ext import commands
 import aiohttp
 from core import log, app_is_owner, run_shutdown, Memory
-from config import INFO, EV_STARTUP, events, COMMAND_PREFIX
+from config import INFO, EV_STARTUP, events, COMMAND_PREFIX, DIR
 from cogs.cogscore import reload_cogs
 from globals import Globals as G
 from config import categories, CT_BOT_OWNER
@@ -13,6 +14,23 @@ from config import categories, CT_BOT_OWNER
 class ControllCog(commands.Cog):
     def __init__(self, bot: commands.Bot):
         self.bot = bot
+
+    # If you dont have a git repo for your bot just remove this :)
+    @app_commands.command(name="_gitpull", description="(*owner) gitpull.")
+    @app_commands.check(app_is_owner)
+    async def gitpull(self, interaction: discord.Interaction):
+        embed = Embed(color=Color.blue(), title="Git Pull", description="`running...`")
+        interaction.response.send_message(embed=embed)
+        result = subprocess.run(["git", "-C", DIR, "pull"], capture_output=True,
+                                text=True, check=False,)
+        embed.description = "`finished`"
+        embed.add_field(name="Result", value=f"`{result.stdout}`")
+        embed.add_field(name="Code", value=f"`{result.returncode}`")
+        if result.returncode == 0:
+            embed.color = Color.green()
+        else:
+            embed.color = Color.red()
+        interaction.edit_original_response(embed=embed)
 
     @app_commands.command(name="_reload_cogs", description="(*owner) Reload bot cogs")
     @app_commands.check(app_is_owner)

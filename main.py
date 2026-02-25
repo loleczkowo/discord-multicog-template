@@ -5,12 +5,13 @@ import platform
 import discord
 from discord.ext import commands
 from dotenv import load_dotenv
+from time import time
 
-from core import log, discord_log, run_shutdown
+from core import log, discord_log, run_shutdown, format_time
 from config import (
     IDs, ids_objects, COMMAND_PREFIX, BOT_VERSION, BOT_ACTIVITY,
-    events, EV_STARTUP, EV_RECCONECT,
-    INFO, SUCCESS, CRITICAL)
+    events, EV_STARTUP, EV_RECCONECT, EV_DISCONECT,
+    INFO, SUCCESS, CRITICAL, WARNING)
 from globals import Globals
 from cogs import load_cogs, cog_list
 
@@ -23,6 +24,7 @@ log(SUCCESS, f"Loaded bot token ('{bot_token[:5]}----------')")
 
 log(INFO, "Launching bot")
 first_setup = True
+disconnect_time = False
 bot = commands.Bot(
     command_prefix=COMMAND_PREFIX,
     intents=discord.Intents.all(),
@@ -33,9 +35,14 @@ bot = commands.Bot(
 
 @bot.event
 async def on_ready():
-    global first_setup
+    global first_setup, disconnect_time
     if not first_setup:
-        log(INFO, "Bot connection is back!")
+        off = disconnect_time - time()
+        disconnect_time = False
+        to_discord = off > 15  # notify discord when offline>10s
+        log(INFO(to_discord=to_discord),
+            f"Bot connection is back! offline for `{format_time(off)}`")
+        Globals.connected = True
         events.call(EV_RECCONECT)
         return
     first_setup = False
@@ -51,6 +58,16 @@ async def on_ready():
     discord_log(INFO, f"## Bot (`V{BOT_VERSION}`) is connected with `{computer_name}`")
     events.call(EV_STARTUP)
     log(SUCCESS, "Bot fully connected")
+
+
+@bot.event
+async def on_disconnect():
+    global disconnect_time
+    if not disconnect_time:
+        Globals.connected = False
+        disconnect_time = time()
+        log(WARNING, "Bot lost connection to discord!")
+        events.call(EV_DISCONECT)
 
 
 @events.on_event(EV_STARTUP, EV_RECCONECT)
