@@ -20,7 +20,7 @@ class ControllCog(commands.Cog):
     @app_commands.check(app_is_owner)
     async def gitpull(self, interaction: discord.Interaction):
         embed = Embed(color=Color.blue(), title="Git Pull", description="`running...`")
-        interaction.response.send_message(embed=embed)
+        await interaction.response.send_message(embed=embed)
         result = subprocess.run(["git", "-C", DIR, "pull"], capture_output=True,
                                 text=True, check=False,)
         embed.description = "`finished`"
@@ -30,7 +30,7 @@ class ControllCog(commands.Cog):
             embed.color = Color.green()
         else:
             embed.color = Color.red()
-        interaction.edit_original_response(embed=embed)
+        await interaction.edit_original_response(embed=embed)
 
     @app_commands.command(name="_reload_cogs", description="(*owner) Reload bot cogs")
     @app_commands.check(app_is_owner)

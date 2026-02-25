@@ -6,7 +6,7 @@ from core.events import Events
 from core.command_category import Categories
 
 # -- MAIN CONFIG --
-# TEMPLATE VERSION - 1.1.0 | 25/02/2026
+# TEMPLATE VERSION - 1.1.1 | 25/02/2026
 BOT_VERSION = "1.0.0"
 DIR = Path(__file__).parent.resolve()
 COMMAND_PREFIX = ":D!"
