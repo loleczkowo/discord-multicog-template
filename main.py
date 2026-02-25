@@ -26,7 +26,8 @@ first_setup = True
 bot = commands.Bot(
     command_prefix=COMMAND_PREFIX,
     intents=discord.Intents.all(),
-    owner_id=IDs.USERS.OWNER
+    owner_id=IDs.USERS.OWNER,
+    help_command=None,
 )
 
 

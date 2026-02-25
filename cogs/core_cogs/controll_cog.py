@@ -6,8 +6,10 @@ from core import log, app_is_owner, run_shutdown, Memory
 from config import INFO, EV_STARTUP, events, COMMAND_PREFIX
 from cogs.cogscore import reload_cogs
 from globals import Globals as G
+from config import categories, CT_BOT_OWNER
 
 
+@categories.set_cog_category(CT_BOT_OWNER)
 class ControllCog(commands.Cog):
     def __init__(self, bot: commands.Bot):
         self.bot = bot

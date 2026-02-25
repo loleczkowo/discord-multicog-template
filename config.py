@@ -1,9 +1,9 @@
 from pathlib import Path
 from discord import CustomActivity
-from core.data_types import LogType, dtEvent
+from core.data_types import LogType, dtEvent, Category
 from core.ids_objects import IDsObjects
 from core.events import Events
-# flake8: noqa
+from core.command_category import Categories
 
 # -- MAIN CONFIG --
 BOT_VERSION = "1.0.0"
@@ -11,21 +11,21 @@ DIR = Path(__file__).parent.resolve()
 COMMAND_PREFIX = ":D!"
 BOT_ACTIVITY = CustomActivity(name=f"Hello World! (V{BOT_VERSION})")
 
-# -- IDS CONFIG --
 
+# -- IDS CONFIG --
 class IDs:
-    GUILD:int = 1078011599924768799
+    GUILD: int = 1078011599924768799
 
     class ROLES:
-        ADMIN:int = 1388671984182890587
+        ADMIN: int = 1388671984182890587
 
     class CHANNELS:
         # the channel where bot logs the console - better to not change name
-        CONSOLE_LOGS:int = 1382306883204939887
+        CONSOLE_LOGS: int = 1382306883204939887
 
     class USERS:
         # bot ofwner - better to not change name
-        OWNER:int = 791000802260811797
+        OWNER: int = 791000802260811797
 
 
 ids_objects = IDsObjects(target=IDs)
@@ -35,6 +35,13 @@ events = Events()
 EV_STARTUP = dtEvent("startup")
 EV_RECCONECT = dtEvent("startup")
 EV_SHUTDOWN = dtEvent("shutdown")
+
+
+# -- Categories --
+CT_MEMBER = Category("Member")
+CT_ADMIN = Category("Admin")
+CT_BOT_OWNER = Category("Bot Owner")
+categories = Categories(default_category=CT_MEMBER)
 
 
 # -- LOGS CONFIG --

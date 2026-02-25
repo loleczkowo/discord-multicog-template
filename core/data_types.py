@@ -21,3 +21,8 @@ class LogType:
 @dataclass
 class dtEvent:
     name: str
+
+
+@dataclass
+class Category:
+    name: str

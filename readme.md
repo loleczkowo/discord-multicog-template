@@ -1,4 +1,5 @@
-This is my desing of a multicog bot.
+This is how I (@loleczkowo) desing discord bot's.
+If you want fell free to contact me i can make a bot for you OR explain how this piece of spaghetti works
 
 This is a template, so you can easily add your own cogs and commands. You can also modify the existing cogs and commands to fit your needs.  
 Feel free to use this code. I appreciate if you give me credit, but you dont have to :D.
@@ -25,6 +26,7 @@ The example of a cog can be found in `cogs/core_cogs/pingcog.py` file. You can a
 ## Current cogs
 - `core_cogs/pingcog.py` - a simple cog that has a ping command to check the bot latency.
 - `core_cogs/controll_cog.py` - a cog that has commands to control the bot (`/_reload cogs`, `/_sync commands`, `/_restart`, `/_shutdown`, `/_botstatus`).
+- `core_cogs/helpcog.py` - basic `help` command.
 
 # Error handling
 The bot has a built-in error handling system that catches common errors and sends a message to the user. The error handling is done in the `core/handle_command_error.py` file.  
@@ -66,3 +68,10 @@ To store varibles that keep their value after bot restart, you can use the `Memo
 Defining a varible goes like `varible123 = Memory("varible123", default=0,)`, To get it use `varible123.mem`.  
 The varible will save itself to a file `memory/memory.json` or `memory/cogs/Cmemory_CogName.json`. As it is a json it can only support normal data  
 Data will save every `MEMORY_AUTOSAVE_TIME` seconds. If you need the data to be saved immediately after change, you can add `save_on_change=True`.
+
+# Categories
+Discord uses already has "command categories" But it uses cogs. This bot has a more of Command-Per-Cog system.
+Therefore Ive implemented a custom category system in `core/command_category`  
+When adding a command you can use `@categories.set_category(CT_ADMIN)` to set a command's category. You can also use `@categories.set_cog_category(CT_BOT_OWNER)` to set a default category for a cog.  
+List of categories is stored in `config.py` file, similary to Events.
+The current category system is only for the `help` command to categorise commands.

@@ -1,0 +1,5 @@
+[flake8]
+max-line-length = 88
+per-file-ignores =
+    config.py:E501
+    core/handle_command_error.py:E501
