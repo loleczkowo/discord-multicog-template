@@ -3,7 +3,7 @@ from discord.ext.commands import Context as CTX
 from discord.ext import commands
 from discord import app_commands
 from core import log, format_traceback
-from .check_permission import AppNotOwner
+from .check_permission import AppNotOwner, MissingReference
 from config import ERROR, events, EV_STARTUP
 from globals import Globals as G
 
@@ -70,6 +70,8 @@ def check_error(error: discord.DiscordException,
             return "This command is currently being used by too many people.", "Please try again later."
         if isinstance(error, commands.DisabledCommand):
             return "This command is currently disabled.", "Please try again later."
+        if isinstance(error, MissingReference):
+            return "Missing Reference", "Please use this command while responding to a message and try again"
         # impossible for app commands
         # user input error
         if isinstance(error, commands.MissingRequiredAttachment):

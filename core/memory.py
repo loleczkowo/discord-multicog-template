@@ -4,7 +4,7 @@ from .data_types import dtEvent
 from .logs import log
 from config import (
     events, EV_SHUTDOWN, MEMORY_DIR, MEMORY_MAIN_FILE, EV_STARTUP, MEMORY_AUTOSAVE_TIME,
-    QINFO
+    QINFO, CRITICAL
 )
 
 _EV_AUTOSAVE = dtEvent("memory_autosave")
@@ -23,10 +23,20 @@ class Memory:
         self._save_on_change = save_on_change
         self._memory = self._load_data(var_name)
         self._need_save = False
+        self.closed = False
         if self._memory is None:
             self._memory = default
+            self._save_data()
         events.register(self._save_data, EV_SHUTDOWN)
-        events.register(self._autosave, _EV_AUTOSAVE)
+        events.register(self.save, _EV_AUTOSAVE)
+
+    def touch(self):
+        if self.closed:
+            raise RuntimeError("Memory already closed")
+        if self._save_on_change:
+            self._save_data()
+        else:
+            self._need_save = True
 
     @property
     def mem(self):
@@ -34,10 +44,7 @@ class Memory:
 
     @mem.setter
     def mem(self, value):
-        if self._save_on_change:
-            self._save_data()
-        else:
-            self._need_save = True
+        self.touch()
         self._memory = value
 
     def _load_data(self, name):
@@ -46,6 +53,10 @@ class Memory:
                 data = json.load(f)
         except FileNotFoundError:
             data = {}
+        except json.JSONDecodeError:
+            log(CRITICAL, f"DATA CORRUPT IN `{self._memory_where}`")
+            self.close()
+            return None
         if name in data:
             return data[name]
         else:
@@ -57,19 +68,24 @@ class Memory:
                 data = json.load(f)
         except FileNotFoundError:
             data = {}
+        except json.JSONDecodeError:
+            log(CRITICAL, f"DATA CORRUPT IN `{self._memory_where}`")
+            self.close()
+            return
         data[self._memory_name] = self._memory
         with open(self._memory_where, "w") as f:
             json.dump(data, f, indent=4)
 
-    def _autosave(self):
+    def save(self):
         if not self._save_on_change and self._need_save:
             self._save_data()
             self._need_save = False
 
     def close(self):
-        self._autosave()
+        self.closed = True
+        self.save()
         events.unregister(self._save_data)
-        events.unregister(self._autosave)
+        events.unregister(self.save)
 
 
 @events.on_event(EV_STARTUP, close_on_shutdown=True)

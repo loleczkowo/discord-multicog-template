@@ -100,20 +100,23 @@ class ControllCog(commands.Cog):
 
     @events.cog_on_event(EV_STARTUP)
     async def _restart_msg(self):
-        rs_update_app_id = Memory("rs_update_app_id", default=None, cog_local=self)
-        rs_update_token = Memory("rs_update_token", default=None, cog_local=self)
-        if rs_update_app_id.mem is not None:
-            embed = Embed(color=Color.green(), title="Restarting Bot",
-                          description="`Bot restarted successfully!`")
-            async with aiohttp.ClientSession() as session:
-                webhook = discord.Webhook.partial(
-                    rs_update_app_id.mem, rs_update_token.mem,
-                    session=session,)
-                await webhook.edit_message("@original", embed=embed,)
-            rs_update_app_id.mem = None
-            rs_update_token.mem = None
-            rs_update_app_id.close()
-            rs_update_token.close()
+        try:
+            rs_update_app_id = Memory("rs_update_app_id", default=None, cog_local=self)
+            rs_update_token = Memory("rs_update_token", default=None, cog_local=self)
+            if rs_update_app_id.mem is not None:
+                embed = Embed(color=Color.green(), title="Restarting Bot",
+                              description="`Bot restarted successfully!`")
+                async with aiohttp.ClientSession() as session:
+                    webhook = discord.Webhook.partial(
+                        rs_update_app_id.mem, rs_update_token.mem,
+                        session=session,)
+                    await webhook.edit_message("@original", embed=embed,)
+                rs_update_app_id.mem = None
+                rs_update_token.mem = None
+                rs_update_app_id.close()
+                rs_update_token.close()
+        except Exception:
+            pass
 
     @app_commands.command(name="_shutdown", description="(*owner) Shut the bot down.")
     @app_commands.check(app_is_owner)

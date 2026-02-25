@@ -54,7 +54,7 @@ class HelpCog(commands.Cog):
             title=f"**All commands from `{bot_server_name}`**",
             description=(
              "**Details** - To get details about a command use:\n"
-             f"**`{used}help command_name`**\n"
+             f"**`{used}help command_name`**\n\u200b"
             ))
         embed.set_thumbnail(url=self.bot.user.avatar.url)
         if len(not_reg_cmds) > 0:

@@ -13,7 +13,7 @@ async def load_cogs(bot: commands.Bot, cog_list: list):
             await bot.add_cog(cog(bot))
             events.load_cog_events(bot.get_cog(cog.__name__))
             categories.load_cog(bot.get_cog(cog.__name__))
-            log(SUCCESS(to_discord=True), "Loaded successfully")
+            log(SUCCESS, "Loaded successfully")
         except commands.errors.ExtensionAlreadyLoaded:
             log(INFO(to_discord=True), "Cog is already loaded")
             continue
@@ -45,7 +45,7 @@ async def reload_cogs(bot: commands.Bot, cog_list: list):
             events.reload_cog_events(bot.get_cog(cogname))
             categories.unload_cog(cogname)
             categories.load_cog(bot.get_cog(cogname))
-            log(SUCCESS(to_discord=True), "Reloaded successfully")
+            log(SUCCESS, "Reloaded successfully")
         except Exception as e:
             failed += 1
             tb = "\n".join(format_traceback(e))

@@ -55,7 +55,11 @@ async def on_ready():
     await ids_objects.build(bot)
     discord_log(INFO, "## --- BOT BOOTING ---\n### LOADING COGS")
     log(INFO, "Loading cogs")
-    await load_cogs(bot, cog_list)
+    failed = await load_cogs(bot, cog_list)
+    if failed == 0:
+        discord_log(SUCCESS, "### Loaded all cogs")
+    else:
+        discord_log(WARNING, f"### Failed to load {failed} cogs")
     Globals.connected = True
     computer_name = platform.node()
     discord_log(INFO, f"## Bot (`V{BOT_VERSION}`) is connected with `{computer_name}`")
@@ -66,6 +70,8 @@ async def on_ready():
 @bot.event
 async def on_disconnect():
     global disconnect_time
+    if Globals.controlled_shutdown:
+        return
     if not disconnect_time:
         Globals.connected = False
         disconnect_time = time()
