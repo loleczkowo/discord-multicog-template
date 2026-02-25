@@ -4,7 +4,8 @@ from discord import app_commands, Embed, Color
 from discord.ext import commands
 import aiohttp
 from core import log, app_is_owner, run_shutdown, Memory
-from config import INFO, EV_STARTUP, events, COMMAND_PREFIX, DIR
+from config import (INFO, EV_STARTUP, events, COMMAND_PREFIX,
+                    DIR, BOT_VERSION, TEMPLATE_VERSION)
 from cogs.cogscore import reload_cogs
 from globals import Globals as G
 from config import categories, CT_BOT_OWNER
@@ -126,6 +127,7 @@ class ControllCog(commands.Cog):
     @app_commands.command(name="_botstatus", description="Get the bot status.")
     async def botstatus(self, interaction: discord.Interaction):
         embed = Embed(color=Color.blue(), title="Bot Status")
+        embed.description = f"BOT `V{BOT_VERSION}`, TEMPLATE `V{TEMPLATE_VERSION}`"
         embed.add_field(name="**COGS**", value="", inline=False)
         for cog in G.cog_list:
             if cog.__name__ in self.bot.cogs:

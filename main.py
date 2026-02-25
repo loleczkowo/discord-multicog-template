@@ -15,6 +15,9 @@ from config import (
 from globals import Globals
 from cogs import load_cogs, cog_list
 
+# TEMPLATE BY loleczkowo
+# "hope you have a nice day :)" - loleczkowo
+
 load_dotenv()
 bot_token = os.getenv("BOT_TOKEN")
 if not bot_token:
