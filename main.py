@@ -40,12 +40,7 @@ bot = commands.Bot(
 async def on_ready():
     global first_setup, disconnect_time
     if not first_setup:
-        off = disconnect_time - time()
-        disconnect_time = False
-        to_discord = off > 15  # notify discord when offline>10s
-        log(INFO(to_discord=to_discord),
-            f"Bot connection is back! offline for `{format_time(off)}`")
-        Globals.connected = True
+        await on_resumed()
         events.call(EV_RECCONECT)
         return
     first_setup = False
@@ -81,7 +76,16 @@ async def on_disconnect():
 
 @bot.event
 async def on_resumed():
-    await on_disconnect
+    global disconnect_time
+    if not disconnect_time:
+        return
+    off = time() - disconnect_time
+    disconnect_time = False
+    to_discord = off > 15  # notify discord when offline>10s
+    log(INFO(to_discord=to_discord),
+        f"Bot connection is back! offline for `{format_time(off)}`")
+    Globals.connected = True
+
 
 @events.on_event(EV_STARTUP, EV_RECCONECT)
 async def set_bot_presence():
