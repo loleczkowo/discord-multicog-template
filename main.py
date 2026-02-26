@@ -79,6 +79,10 @@ async def on_disconnect():
         events.call(EV_DISCONECT)
 
 
+@bot.event
+async def on_resumed():
+    await on_disconnect
+
 @events.on_event(EV_STARTUP, EV_RECCONECT)
 async def set_bot_presence():
     await bot.change_presence(activity=BOT_ACTIVITY)
