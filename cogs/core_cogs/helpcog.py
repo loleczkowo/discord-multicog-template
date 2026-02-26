@@ -3,6 +3,7 @@ from discord import app_commands
 from discord.ext import commands
 from config import (
     categories, COMMAND_PREFIX, BOT_VERSION, TEMPLATE_VERSION, BOT_GITHUB_LINK)
+from core import human_type
 
 
 class HelpCog(commands.Cog):
@@ -40,10 +41,25 @@ class HelpCog(commands.Cog):
                 desc = cmds[clean_spec].description
                 if desc is None:
                     desc = "MISSING"
-                embed.description = f"`/{specify}`: '{desc}'"
+                embed.description = f"`{COMMAND_PREFIX}{clean_spec}`: '{desc}'"
+                use = f"{clean_spec} "+" ".join(cmds[clean_spec].clean_params.keys())
+                embed.add_field(
+                    name="Use", value=f"`{COMMAND_PREFIX}{use}`", inline=False)
+                for t in cmds[clean_spec].clean_params.items():
+                    embed.add_field(name=f"`{t[0]}`",
+                                    value=f"`{human_type(t[1].annotation)}`")
             elif not specify.startswith(COMMAND_PREFIX) and clean_spec in app_cmds:
                 desc = app_cmds[clean_spec].description
-                embed.description = f"`/{specify}`: '{desc}'"
+                if desc is None:
+                    desc = "MISSING"
+                embed.description = f"`/{clean_spec}`: '{desc}'"
+                use = f"{clean_spec} "+" ".join(
+                    [p.name for p in app_cmds[clean_spec].parameters])
+                embed.add_field(
+                    name="Use", value=f"`{COMMAND_PREFIX}{use}`", inline=False)
+                for t in app_cmds[clean_spec].parameters:
+                    embed.add_field(name=f"`{t.name}`",
+                                    value=f"{t.description} - `{t.type}`")
             else:
                 embed.description = f"command `{specify}` not found"
             return embed

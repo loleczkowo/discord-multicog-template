@@ -6,7 +6,7 @@ from core.events import Events
 from core.command_category import Categories
 
 # -- MAIN CONFIG --
-TEMPLATE_VERSION = "2.1.1"
+TEMPLATE_VERSION = "2.2.0"
 BOT_VERSION = "1.0.0"
 BOT_GITHUB_LINK = None  # if your bot has a public github put it here so people can find it!
 DIR = Path(__file__).parent.resolve()

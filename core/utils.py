@@ -1,5 +1,6 @@
 from traceback import format_exception
-from typing import List
+from typing import List, get_args, Union
+from discord import Emoji, Member, User, Role, TextChannel, VoiceChannel
 
 
 def traceback_lines(error) -> List[str]:
@@ -44,3 +45,24 @@ def format_time(seconds: float):
         text += "and "
     text += str(seconds)+" second"+"s"*(not seconds == 1)
     return text
+
+
+def human_type(tp) -> str:
+    if hasattr(tp, "__origin__"):
+        if tp.__origin__ is Union:
+            return " Or ".join([human_type(typ) for typ in get_args(tp)])
+    if tp is int:
+        return "Number"
+    if tp is str:
+        return "Text"
+    if tp is Emoji:
+        return "Emoji"
+    if tp in (User, Member):
+        return "User"
+    if tp is Role:
+        return "Role"
+    if tp is TextChannel:
+        return "Text Channel"
+    if tp is VoiceChannel:
+        return "Voice Channel"
+    return "Unknown"
