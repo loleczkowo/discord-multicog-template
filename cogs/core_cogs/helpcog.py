@@ -60,18 +60,16 @@ class HelpCog(commands.Cog):
         if len(not_reg_cmds) > 0:
             embed.add_field(name="**WARNING**-not synced commands;",
                             value="`/"+"` `/".join(not_reg_cmds)+"`", inline=False)
-        for category in categories.categories.keys():
-            app_cmds_str = "`/"+"`\n`/".join(categories.categories[category][1])+"`"
+        for category in categories.get_categories():
+            cat_name = category.name
+            app_cmds_str = "`/"+"`\n`/".join(categories.categories[cat_name][1])+"`"
             cmds_str = "`"+COMMAND_PREFIX+f"`\n`{COMMAND_PREFIX}".join(
-                categories.categories[category][0])+"`"
-            if len(categories.categories[category][1]) == 0:
+                categories.categories[cat_name][0])+"`"
+            if len(categories.categories[cat_name][1]) == 0:
                 app_cmds_str = ""
-            if len(categories.categories[category][0]) == 0:
+            if len(categories.categories[cat_name][0]) == 0:
                 cmds_str = ""
-            embed.add_field(
-                name=category,
-                value=app_cmds_str+"\n\n"+cmds_str
-            )
+            embed.add_field(name=cat_name, value=app_cmds_str+"\n\n"+cmds_str)
         template_link = "https://github.com/loleczkowo/discord-multicog-template"
         github_link = ""
         if BOT_GITHUB_LINK is not None:

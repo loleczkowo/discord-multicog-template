@@ -6,7 +6,7 @@ from core.events import Events
 from core.command_category import Categories
 
 # -- MAIN CONFIG --
-TEMPLATE_VERSION = "2.0.1"
+TEMPLATE_VERSION = "2.1.0"
 BOT_VERSION = "1.0.0"
 BOT_GITHUB_LINK = None  # if your bot has a public github put it here so people can find it!
 DIR = Path(__file__).parent.resolve()
@@ -41,9 +41,9 @@ EV_SHUTDOWN = dtEvent("shutdown")
 
 
 # -- Categories --
-CT_MEMBER = Category("Member")
-CT_ADMIN = Category("Admin")
-CT_BOT_OWNER = Category("Bot Owner")
+CT_MEMBER = Category("Member", sort_priority=0)  # first
+CT_ADMIN = Category("Admin", sort_priority=-2)  # almsot last
+CT_BOT_OWNER = Category("Bot Owner", sort_priority=-1)  # last
 categories = Categories(default_category=CT_MEMBER)
 
 

@@ -26,3 +26,4 @@ class dtEvent:
 @dataclass
 class Category:
     name: str
+    sort_priority: int = None

@@ -12,6 +12,11 @@ class Categories:
         self._func_category: Dict[int, Tuple[Category, str, bool]] = {}
         # CLEANUP DATA id(func): (category, funcname, isapp)
         self._cog_registered: Dict[str, List[Callable]] = {}  # classname: [func]
+        self._sort_categories_left: List[Category] = []
+        self._sort_categories_right: List[Category] = []
+        self._sort_categories_middle: List[Category] = []
+        self._sort_left_data: Dict[Dict] = {"var": 0, "go": {}}
+        self._sort_right_data: Dict[Dict] = {"var": 0, "go": {}}
 
     def set_cog_category(self, category: Category):
         def ctg(cls: type):
@@ -24,6 +29,36 @@ class Categories:
             func.__custom_cmd_category__ = category
             return func
         return ctg
+
+    def get_categories(self):
+        return (self._sort_categories_left +
+                self._sort_categories_middle +
+                self._sort_categories_right)
+
+    def _place_category(self, category: Category):
+        def __place_category(level: int, now: Dict, i: int):
+            if level <= 0:
+                now["var"] = now.get("var", 0) + 1
+                return now, i
+            if "go" not in now:
+                now["go"] = {}
+            i2 = i + now.get("var", 0)
+            now["go"], fi = __place_category(level-1, now["go"], i2)
+            return now, fi
+
+        if category.sort_priority is None:
+            if category not in self._sort_categories_middle:
+                self._sort_categories_middle.append(category)
+            return
+        if category in self._sort_categories_left + self._sort_categories_right:
+            return
+        if category.sort_priority < 0:
+            _, i = __place_category(-category.sort_priority-1, self._sort_right_data, 0)
+            self._sort_categories_right.insert(
+                len(self._sort_categories_right)-i, category)
+        else:
+            _, i = __place_category(category.sort_priority, self._sort_left_data, 0)
+            self._sort_categories_left.insert(i, category)
 
     def load_cog(self, cog: type):
         default = self.default_category
@@ -50,6 +85,7 @@ class Categories:
                 raise RuntimeError("Only commands can have categories")
             if category is None:
                 category = default
+            self._place_category(category)
             cmd_name = getattr(attr, "qualified_name")
             if category.name not in self.categories:
                 self.categories[category.name] = ([], [])
