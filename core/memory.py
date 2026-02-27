@@ -1,5 +1,6 @@
 import json
 import asyncio
+from typing import Dict
 from .data_types import dtEvent
 from .logs import log
 from config import (
@@ -11,11 +12,30 @@ _EV_AUTOSAVE = dtEvent("memory_autosave")
 
 
 class Memory:
-    # FIXME when re-loading cogs memory can duplicate.
-    # maybe fix: have dict[var_name: Class]
-    # close the last and overwrite when opening new memory with same var_name
+    _memories: Dict[str, "Memory"] = {}
+    # "memorywhere_varname": object
+
+    def __new__(cls, var_name: str, default, cog_local: object = None,
+                save_on_change=False):
+        if cog_local is not None:
+            _memory_where = \
+                MEMORY_DIR/"cogs"/f"Cmemory_{cog_local.__class__.__name__}.json"
+        else:
+            _memory_where = MEMORY_MAIN_FILE
+        key = f"{_memory_where}_{var_name}"
+        if key in cls._memories:
+            print("already inicialized", var_name)
+            if not cls._memories[key]._save_on_change:
+                cls._memories[key]._save_on_change = save_on_change
+            return cls._memories[key]
+        instance = super().__new__(cls)
+        cls._memories[key] = instance
+        return instance
+
     def __init__(self, var_name: str, default, cog_local: object = None,
                  save_on_change=False):
+        if getattr(self, "_initialized", False):
+            return
         if cog_local is not None:
             self._memory_where = \
                 MEMORY_DIR/"cogs"/f"Cmemory_{cog_local.__class__.__name__}.json"
@@ -32,6 +52,7 @@ class Memory:
             self._save_data()
         events.register(self._save_data, EV_SHUTDOWN)
         events.register(self.save, _EV_AUTOSAVE)
+        self._initialized = True
 
     def touch(self):
         if self.closed:
