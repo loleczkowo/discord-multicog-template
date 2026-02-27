@@ -5,6 +5,8 @@ from config import (
     categories, COMMAND_PREFIX, BOT_VERSION, TEMPLATE_VERSION, BOT_GITHUB_LINK)
 from core import human_type, human_type_OptionType
 
+COLUMNS_PER_CATEGORY = 2
+
 
 # Cog by loleczkowo :D  - feel free to edit/copy anything
 
@@ -79,6 +81,7 @@ class HelpCog(commands.Cog):
         if len(not_reg_cmds) > 0:
             embed.add_field(name="**WARNING**-not synced commands;",
                             value="`/"+"` `/".join(not_reg_cmds)+"`", inline=False)
+        column = 0
         for category in categories.get_categories():
             cat_name = category.name
             app_cmds_str = "`/"+"`\n`/".join(categories.categories[cat_name][1])+"`"
@@ -89,6 +92,9 @@ class HelpCog(commands.Cog):
             if len(categories.categories[cat_name][0]) == 0:
                 cmds_str = ""
             embed.add_field(name=cat_name, value=app_cmds_str+"\n\n"+cmds_str)
+            column += 1
+            if column % COLUMNS_PER_CATEGORY == 0:
+                embed.add_field(name="\u200b", value="\u200b", inline=False)
         template_link = "https://github.com/loleczkowo/discord-multicog-template"
         github_link = ""
         if BOT_GITHUB_LINK is not None:
