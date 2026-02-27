@@ -52,13 +52,13 @@ class ControllCog(commands.Cog):
             embed.color = Color.red()
         await interaction.edit_original_response(embed=embed)
 
-    @app_commands.command(name="_sync_commands", description="(*owner) Sync commands")
-    @app_commands.check(app_is_owner)
-    async def sync_commands(self, interaction: discord.Interaction):
-        log(INFO(to_discord=True), "SyncCommands command invoked by ", interaction.user)
+    @commands.command(name="_sync_commands", description="(*owner) Sync commands")
+    @commands.is_owner()
+    async def sync_commands(self, ctx: commands.Context):
+        log(INFO(to_discord=True), "SyncCommands command invoked by ", ctx.author.name)
         embed = Embed(color=Color.yellow(), title="Syncing Commands",
                       description="`Syncing . . .`")
-        await interaction.response.send_message(embed=embed)
+        msg = await ctx.send(embed=embed)
         app_cmds_list = await self.bot.tree.fetch_commands()
         bef_sync_cmds = [command.name for command in app_cmds_list]
         await self.bot.tree.sync()
@@ -82,7 +82,7 @@ class ControllCog(commands.Cog):
                 + "` `/".join(new_commands)+"`"\
                 "\n\ncommand list;\n`/"+"` `/".join(all_cmds)+"`"
             embed.color = Color.green()
-        await interaction.edit_original_response(embed=embed)
+        await msg.edit(embed=embed)
 
     @app_commands.command(name="_restart", description="(*owner) Hard-restart the bot")
     @app_commands.check(app_is_owner)

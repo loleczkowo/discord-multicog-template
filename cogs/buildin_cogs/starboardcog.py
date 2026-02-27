@@ -167,7 +167,6 @@ class StarboardCog(commands.Cog):
             return
         msgs = self.update_olds.pop(0)
         id, message, original_message = msgs[0], msgs[1], msgs[2]
-        print("slower edit")
         await self._message_true_update(id, message, original_message)
 
     @tasks.loop(seconds=FREESH_MESSAGE_UPDATE, reconnect=True)
@@ -176,7 +175,6 @@ class StarboardCog(commands.Cog):
             return
         msgs = self.update_news.pop(0)
         id, message, original_message = msgs[0], msgs[1], msgs[2]
-        print("faster edit")
         await self._message_true_update(id, message, original_message)
 
     @commands.Cog.listener()
