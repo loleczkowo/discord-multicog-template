@@ -1,11 +1,14 @@
 import discord
 from discord import app_commands
-from discord.ext import commands
+from discord.ext import commands, tasks
 from core import Memory, embed_from_message, log
-from config import categories, CT_ADMIN, INFO
+from config import categories, CT_ADMIN, INFO, events, EV_SHUTDOWN
 
 STAR = "⭐"
 STR_MESSAGE = f"{STAR} **{{stars}}** | {{mention}}"
+# for discord rate-limits
+FREESH_MESSAGE_UPDATE = 2  # 2 seconds for each <1h starboard message update
+OLD_MESSAGE_UPDATE = 10  # 10 seconds for each >1h starboard message update
 
 
 # Cog by loleczkowo :D  - feel free to edit/copy anything
@@ -23,6 +26,11 @@ class StarboardCog(commands.Cog):
         # {bot_chan.id+bot_msg.id: {
         # "ori_id":, "ori_chan__id":, "users": [user.id, user.id]} }
         self.ignore_removal = set()  # (channelid, messageid, userid)
+
+        self.update_olds: list = []  # starboard messages to update
+        self.update_news: list = []  # [(id, message, original_message)]
+        self._oldupdate_loop.start()
+        self._freshupdate_loop.start()
 
     @app_commands.command(name="_starboard_set_channel",
                           description="sets starboard channel")
@@ -106,7 +114,6 @@ class StarboardCog(commands.Cog):
         return f"{chanid}_{messageid}"
 
     async def _update_starmessage(self, id: str, message=False, original_message=False):
-        stars = len(self.bot_messages.mem[id]["users"])
         if not message:
             t = id.split("_")
             chanid, messid = int(t[0]), int(t[1])
@@ -120,6 +127,17 @@ class StarboardCog(commands.Cog):
                 self.messages.touch()
                 self.bot_messages.touch()
                 return
+        toup = [id, message, original_message]
+        if toup in self.update_olds or toup in self.update_news:
+            return  # already in queue to be updated
+        if (discord.utils.utcnow() - message.created_at).total_seconds() > 3600:
+            self.update_olds.append(toup)
+        else:
+            self.update_news.append(toup)
+
+    async def _message_true_update(
+            self, id, message: discord.Message, original_message):
+        stars = len(self.bot_messages.mem[id]["users"])
         if not original_message:
             try:
                 ori_chan = await self.bot.fetch_channel(
@@ -132,12 +150,34 @@ class StarboardCog(commands.Cog):
                     embed=discord.Embed(color=discord.Color.gold(),
                                         description="`Message lost`"))
                 return
-
         l, e, r, a = await embed_from_message(
             original_message, discord.Color.gold(), original_message.reference)
         await message.edit(
             content=STR_MESSAGE.format(stars=stars, mention=original_message.jump_url),
             embeds=l + [e] + r, attachments=a)
+
+    @events.cog_on_event(EV_SHUTDOWN)
+    def cog_unload(self):
+        self._oldupdate_loop.cancel()
+        self._freshupdate_loop.cancel()
+
+    @tasks.loop(seconds=OLD_MESSAGE_UPDATE, reconnect=True)
+    async def _oldupdate_loop(self):
+        if not self.update_olds:
+            return
+        msgs = self.update_olds.pop(0)
+        id, message, original_message = msgs[0], msgs[1], msgs[2]
+        print("slower edit")
+        await self._message_true_update(id, message, original_message)
+
+    @tasks.loop(seconds=FREESH_MESSAGE_UPDATE, reconnect=True)
+    async def _freshupdate_loop(self):
+        if not self.update_news:
+            return
+        msgs = self.update_news.pop(0)
+        id, message, original_message = msgs[0], msgs[1], msgs[2]
+        print("faster edit")
+        await self._message_true_update(id, message, original_message)
 
     @commands.Cog.listener()
     async def on_raw_reaction_add(self, payload: discord.RawReactionActionEvent):
