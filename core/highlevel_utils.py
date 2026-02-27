@@ -48,13 +48,11 @@ async def embed_from_message(
                 to_start.append(Embed(
                     color=Color.light_gray(), description="`Message lost`"))
     embed.timestamp = message.created_at
-    added_img = False
     add_to_end = []
     for att in message.attachments:
         if att.content_type:
             if att.content_type.startswith("image"):
-                if not added_img:
-                    added_img = True
+                if not embed.image:
                     embed.set_image(url=att.url)
                 else:
                     e = Embed(color=color)
@@ -64,6 +62,16 @@ async def embed_from_message(
         attach.append(await att.to_file())
     for emd in message.embeds:
         emd.color = color
+        if not emd.type == "rich":
+            if emd.type in ("gifv", "image"):
+                # if emd.type == "gifv" and not emd.url.endswith(".gif"):
+                #     pass  # You can try fixing this.  But if its for tenor - Dont
+                if not embed.image:
+                    embed.set_image(url=emd.url)
+                    continue
+            if emd.thumbnail and not emd.image:
+                emd.set_image(url=emd.thumbnail.url)
+                emd.set_thumbnail(url=None)
         add_to_end.append(emd)
 
     while len(to_start)+1+len(add_to_end) > DISCORD_EMBED_LIMIT:

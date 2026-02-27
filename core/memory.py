@@ -11,6 +11,9 @@ _EV_AUTOSAVE = dtEvent("memory_autosave")
 
 
 class Memory:
+    # FIXME when re-loading cogs memory can duplicate.
+    # maybe fix: have dict[var_name: Class]
+    # close the last and overwrite when opening new memory with same var_name
     def __init__(self, var_name: str, default, cog_local: object = None,
                  save_on_change=False):
         if cog_local is not None:
