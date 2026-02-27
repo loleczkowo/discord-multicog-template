@@ -44,8 +44,8 @@ class Memory:
 
     @mem.setter
     def mem(self, value):
-        self.touch()
         self._memory = value
+        self.touch()
 
     def _load_data(self, name):
         try:
@@ -55,6 +55,7 @@ class Memory:
             data = {}
         except json.JSONDecodeError:
             log(CRITICAL, f"DATA CORRUPT IN `{self._memory_where}`")
+            self._need_save = False
             self.close()
             return None
         if name in data:
@@ -63,6 +64,7 @@ class Memory:
             return None
 
     def _save_data(self):
+        self._need_save = False
         try:
             with open(self._memory_where, "r") as f:
                 data = json.load(f)
@@ -79,7 +81,6 @@ class Memory:
     def save(self):
         if not self._save_on_change and self._need_save:
             self._save_data()
-            self._need_save = False
 
     def close(self):
         self.closed = True

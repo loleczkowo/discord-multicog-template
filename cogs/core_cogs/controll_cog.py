@@ -11,6 +11,8 @@ from globals import Globals as G
 from config import categories, CT_BOT_OWNER
 
 
+# Cog by loleczkowo :D  - feel free to edit/copy anything
+
 @categories.set_cog_category(CT_BOT_OWNER)
 class ControllCog(commands.Cog):
     def __init__(self, bot: commands.Bot):

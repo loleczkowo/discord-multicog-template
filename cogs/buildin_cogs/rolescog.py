@@ -8,6 +8,8 @@ from config import (
     CT_ADMIN, categories, COMMAND_PREFIX, WARNING, events, EV_STARTUP, INFO)
 
 
+# Cog by loleczkowo :D  - feel free to edit/copy anything
+
 @categories.set_cog_category(CT_ADMIN)
 class RolesCog(commands.Cog):
     def __init__(self, bot: commands.Bot):
@@ -25,7 +27,7 @@ class RolesCog(commands.Cog):
             await self._update(id)
 
     @app_commands.command(name="_rs_setup_roles", description="setups role selection")
-    @app_commands.default_permissions(administrator=True)
+    @app_commands.checks.has_permissions(administrator=True)
     async def setup_roles(self, inter: Interaction):
         await inter.response.send_message((
             "To add new roles use "
@@ -174,6 +176,12 @@ class RolesCog(commands.Cog):
         guild = self.bot.get_guild(payload.guild_id)
         member = guild.get_member(user.id)
         add_role = guild.get_role(self.emoji_role.mem[main_id])
+        if add_role is None:
+            message_link = (f"https://discord.com/channels/{payload.guild_id}/"
+                            f"{payload.channel_id}/{payload.message_id}")
+            log(WARNING(to_discord=True, ping=True), f"Role selection {message_link} " +
+                f"Cannot add role `{self.emoji_role.mem[main_id]}` (missing)")
+            return
         if add_role in member.roles:
             log(INFO, f"{member.name} already has the role {add_role.name}")
             return
@@ -191,6 +199,12 @@ class RolesCog(commands.Cog):
         guild = self.bot.get_guild(payload.guild_id)
         member = guild.get_member(user.id)
         remove_role = guild.get_role(self.emoji_role.mem[main_id])
+        if remove_role is None:
+            message_link = (f"https://discord.com/channels/{payload.guild_id}/"
+                            f"{payload.channel_id}/{payload.message_id}")
+            log(WARNING(to_discord=True, ping=True), f"Role selection {message_link} " +
+                f"Cannot remove role `{self.emoji_role.mem[main_id]}` is (missing)")
+            return
         if remove_role not in member.roles:
             log(INFO, f"{member.name} already has no {remove_role.name} role")
             return

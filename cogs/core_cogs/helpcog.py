@@ -3,8 +3,10 @@ from discord import app_commands
 from discord.ext import commands
 from config import (
     categories, COMMAND_PREFIX, BOT_VERSION, TEMPLATE_VERSION, BOT_GITHUB_LINK)
-from core import human_type
+from core import human_type, human_type_OptionType
 
+
+# Cog by loleczkowo :D  - feel free to edit/copy anything
 
 class HelpCog(commands.Cog):
     def __init__(self, bot: commands.Bot):
@@ -56,10 +58,11 @@ class HelpCog(commands.Cog):
                 use = f"{clean_spec} "+" ".join(
                     [p.name for p in app_cmds[clean_spec].parameters])
                 embed.add_field(
-                    name="Use", value=f"`{COMMAND_PREFIX}{use}`", inline=False)
+                    name="Use", value=f"`/{use}`", inline=False)
                 for t in app_cmds[clean_spec].parameters:
-                    embed.add_field(name=f"`{t.name}`",
-                                    value=f"{t.description} - `{t.type}`")
+                    embed.add_field(
+                        name=f"`{t.name}`",
+                        value=f"{t.description} - `{human_type_OptionType(t.type)}`")
             else:
                 embed.description = f"command `{specify}` not found"
             return embed

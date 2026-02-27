@@ -1,6 +1,7 @@
 from traceback import format_exception
 from typing import List, get_args, Union
-from discord import Emoji, Member, User, Role, TextChannel, VoiceChannel
+from discord import (
+    Emoji, Member, User, Role, TextChannel, VoiceChannel, AppCommandOptionType)
 
 
 def traceback_lines(error) -> List[str]:
@@ -18,7 +19,8 @@ def format_traceback(error) -> List[str]:
             tmp = parts[0].split(" ")
             tmp[0] = "File"
             parts[0] = " ".join(tmp)
-            parts[2] = f"in {parts[2].split()[1]}"
+            if len(parts) >= 3:
+                parts[2] = f"in {parts[2].split()[1]}"
             formatted_lines.append(", ".join(parts))
         elif stripped and all(c in "^~" for c in stripped):
             formatted_lines.append(line)
@@ -66,3 +68,18 @@ def human_type(tp) -> str:
     if tp is VoiceChannel:
         return "Voice Channel"
     return "Unknown"
+
+
+def human_type_OptionType(ot: AppCommandOptionType) -> str:
+    mapping = {
+        AppCommandOptionType.integer: "Number",
+        AppCommandOptionType.number: "Decimal number",
+        AppCommandOptionType.string: "Text",
+        AppCommandOptionType.boolean: "True/False",
+        AppCommandOptionType.user: "User",
+        AppCommandOptionType.channel: "Channel",
+        AppCommandOptionType.role: "Role",
+        AppCommandOptionType.mentionable: "Mentionable",
+        AppCommandOptionType.attachment: "File",
+    }
+    return mapping.get(ot, str(ot))

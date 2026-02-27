@@ -1,3 +1,4 @@
+import sys
 import discord
 from discord.ext.commands import Context as CTX
 from discord.ext import commands
@@ -27,11 +28,21 @@ async def setup():
             embed=discord.Embed(title=cause, description=message,
                                 color=discord.Color.red()), ephemeral=True)
 
+    @G.bot.event
+    async def on_error(method, *args, **kwargs):
+        _, error, _ = sys.exc_info()
+        formatted_error_lines = '\n'.join(format_traceback(error))
+        log(ERROR(to_discord=True, newline_formatting=False, ping=True),
+            f"error in `{method}` failed: `{error}`\n```{formatted_error_lines}```")
+
 
 def check_error(error: discord.DiscordException,
                 is_app_command: bool, context: CTX | discord.Interaction):
+    o_err = error
     cmd_name = context.invoked_with if not is_app_command else context.command.name
     author_id = context.author.id if not is_app_command else context.user.id
+    if isinstance(error, (commands.CommandInvokeError, app_commands.CommandInvokeError)):
+        error = getattr(error, "original", None) or getattr(error, "__cause__", None) or error
 
     if isinstance(error, (commands.CommandNotFound, app_commands.CommandNotFound)):
         if is_app_command:
@@ -56,6 +67,8 @@ def check_error(error: discord.DiscordException,
     if isinstance(error, (commands.CommandOnCooldown, app_commands.CommandOnCooldown)):
         return "This command is on cooldown.", \
                 f"Try again in {round(error.retry_after, 2)} seconds."
+    if isinstance(error, commands.BadArgument):  # normally for commands only but can be used in app_commands
+        return "Invalid argument provided.", str(error)
     if not is_app_command:
         # TODO add these for app commands as well
         if isinstance(error, commands.NSFWChannelRequired):
@@ -77,8 +90,6 @@ def check_error(error: discord.DiscordException,
         if isinstance(error, commands.MissingRequiredAttachment):
             return "Missing required attachment.", \
                   f"Please attach the required file `{error.param.name}` and try again."
-        if isinstance(error, commands.BadArgument):
-            return "Invalid argument provided.", str(error)
         if isinstance(error, commands.MissingRequiredArgument):
             return "Missing required argument.", \
                    "missing argument: "+error.param.name
@@ -95,14 +106,14 @@ def check_error(error: discord.DiscordException,
             return "Invalid input.", str(error)
 
     # command error
-    if not isinstance(error, (commands.CommandError, app_commands.AppCommandError)):
+    if not isinstance(o_err, (commands.CommandError, app_commands.AppCommandError)):
         log(ERROR(to_discord=True, ping=True), f"Unexpected error for command "
-            f"'{cmd_name}' by `{author_id}` error; {error}")
+            f"'{cmd_name}' by `{author_id}` error; {o_err}")
         return "An unexpected error occurred while processing the command.", \
                "(you were supposed to get a more specific error message, "\
                "but something went wrong while, whoops!)"
     formatted_error_lines = '\n'.join(format_traceback(error))
     log(ERROR(to_discord=True, newline_formatting=False, ping=True),
-        f"Command `{cmd_name}` failed: `{error}`\n```{formatted_error_lines}```")
+        f"Command `{cmd_name}` failed: `{o_err}`\n```{formatted_error_lines}```")
     return "An unexpected error occurred while processing the command.", \
            "uhoh! command error! admins are on their way to fix this!"

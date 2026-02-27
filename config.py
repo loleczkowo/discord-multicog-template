@@ -6,12 +6,15 @@ from core.events import Events
 from core.command_category import Categories
 
 # -- MAIN CONFIG --
-TEMPLATE_VERSION = "2.3.0"
+TEMPLATE_VERSION = "2.4.3"
 BOT_VERSION = "1.0.0"
 BOT_GITHUB_LINK = None  # if your bot has a public github put it here so people can find it!
 DIR = Path(__file__).parent.resolve()
 COMMAND_PREFIX = ":D!"
 BOT_ACTIVITY = CustomActivity(name=f"Hello World! (V{BOT_VERSION})")
+
+DISCORD_CHAR_LIMIT = 2000
+DISCORD_EMBED_LIMIT = 10
 
 
 # -- IDS CONFIG --
@@ -52,7 +55,6 @@ LOG_DIR = DIR/"logs"
 LOG_RETENTION_DAYS = 3
 LOG_TO_CONSOLE = True
 LOG_TIME_FORMAT = "%H:%M:%S"
-DISCORD_CHAR_LIMIT = 2000
 
 
 # ignore_closed_console does NOT ignore LOG_TO_CONSOLE=false
