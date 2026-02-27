@@ -41,7 +41,6 @@ async def on_ready():
     global first_setup, disconnect_time
     if not first_setup:
         await on_resumed()
-        events.call(EV_RECCONECT)
         return
     first_setup = False
     Globals.bot = bot
@@ -85,6 +84,7 @@ async def on_resumed():
     log(INFO(to_discord=to_discord),
         f"Bot connection is back! offline for `{format_time(off)}`")
     Globals.connected = True
+    events.call(EV_RECCONECT)
 
 
 @events.on_event(EV_STARTUP, EV_RECCONECT)

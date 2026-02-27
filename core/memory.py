@@ -24,7 +24,6 @@ class Memory:
             _memory_where = MEMORY_MAIN_FILE
         key = f"{_memory_where}_{var_name}"
         if key in cls._memories:
-            print("already inicialized", var_name)
             if not cls._memories[key]._save_on_change:
                 cls._memories[key]._save_on_change = save_on_change
             return cls._memories[key]
@@ -50,7 +49,7 @@ class Memory:
         if self._memory is None:
             self._memory = default
             self._save_data()
-        events.register(self._save_data, EV_SHUTDOWN)
+        events.register(self.close, EV_SHUTDOWN)
         events.register(self.save, _EV_AUTOSAVE)
         self._initialized = True
 
@@ -107,10 +106,13 @@ class Memory:
             self._save_data()
 
     def close(self):
+        if self.closed:
+            return
         self.closed = True
         self.save()
         events.unregister(self._save_data)
         events.unregister(self.save)
+        del self.__class__._memories[f"{self._memory_where}_{self._memory_name}"]
 
 
 @events.on_event(EV_STARTUP, close_on_shutdown=True)
