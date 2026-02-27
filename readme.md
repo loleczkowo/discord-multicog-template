@@ -29,7 +29,8 @@ Main cogs;
 - `core_cogs/helpcog.py` - basic `help` command.
 More optional cogs;
 - `buildin_cogs/pingcog.py` - a simple cog that has a ping command to check the bot latency.
-- `buildin_cogs/rolescog.py` - allows user to make role selections
+- `buildin_cogs/rolescog.py` - allows user to make role selections.
+- `buildin_cogs/starboard.py` - complex starboard module.
 
 # Error handling
 The bot has a built-in error handling system that catches common errors and sends a message to the user. The error handling is done in the `core/handle_command_error.py` file.  
