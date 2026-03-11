@@ -85,11 +85,21 @@ class Events:
 
     def call(self, event: dtEvent):
         sevent = event.name
-        if sevent in self.async_registered:
+
+        async def _call_async():
             for async_to_run in self.async_registered[sevent]:
                 task = asyncio.create_task(async_to_run())
                 if id(async_to_run) in self.close_on_shutdown:
                     self.close_on_shutdown_tasks.append(task)
+        if sevent in self.async_registered:
+            try:
+                asyncio.get_running_loop()
+                for async_to_run in self.async_registered[sevent]:
+                    task = asyncio.create_task(async_to_run())
+                    if id(async_to_run) in self.close_on_shutdown:
+                        self.close_on_shutdown_tasks.append(task)
+            except RuntimeError:
+                asyncio.run(_call_async())
         if sevent not in self.registered:
             return
         for to_run in self.registered[sevent]:

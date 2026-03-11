@@ -6,7 +6,7 @@ from core.events import Events
 from core.command_category import Categories
 
 # -- MAIN CONFIG --
-TEMPLATE_VERSION = "2.5.2"
+TEMPLATE_VERSION = "2.6.0"
 BOT_VERSION = "1.0.0"
 BOT_GITHUB_LINK = None  # if your bot has a public github put it here so people can find it!
 DIR = Path(__file__).parent.resolve()
@@ -39,7 +39,7 @@ ids_objects = IDsObjects(target=IDs)
 events = Events()
 EV_STARTUP = dtEvent("startup")
 EV_DISCONECT = dtEvent("disconect")
-EV_RECCONECT = dtEvent("startup")
+EV_RECCONECT = dtEvent("recconect")
 EV_SHUTDOWN = dtEvent("shutdown")
 
 
