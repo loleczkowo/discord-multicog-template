@@ -109,6 +109,6 @@ if __name__ == "__main__":
     asyncio.run(main())
 
 if Globals.restarting:
-    os.execv(sys.executable, ['python'] + sys.argv)
+    os.execv(sys.executable, [sys.executable] + sys.argv)
 else:
     log(INFO, "--- Bot is offline. ---")
